@@ -9,7 +9,10 @@ class UserService {
         return res; // 表数据都在dataValues中返回
     }
     async findUser (user_name) {
-        let res = await User.findOne({where: {user_name}});
+        let res = await User.findOne({
+            attributes: ['id', 'user_name', 'password', 'is_admin'],
+            where: {user_name}
+        });
         return res ? res.user_name : null;
     }
 }
