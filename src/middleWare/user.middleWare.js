@@ -1,5 +1,5 @@
 const {findUser} = require('../service/user.service');
-const {userFormatError, userExited, registerFail, userNotExited, passwordError} = require('../validate/validateResult');
+const {userFormatError, userExited, registerFail, userNotExited, passwordError, pwdIsIdentical} = require('../validate/validateResult');
 const bcrypt = require('bcryptjs');
 const userValidate = async (ctx, next) => {
     const {user_name, password} = ctx.request.body;
@@ -8,6 +8,10 @@ const userValidate = async (ctx, next) => {
         ctx.app.emit('error', userFormatError, ctx);
         return
     }
+    await next(); // 必须写成同步形式
+}
+const userIsExited = async (ctx, next) => {
+    const {user_name} = ctx.request.body;
     // 异常处理
     try {
         if (await findUser(user_name)) {
@@ -23,10 +27,9 @@ const userValidate = async (ctx, next) => {
 }
 const verifyUser = async (ctx, next) => {
     const {user_name, password} = ctx.request.body;
-    let res = null;
     // 用户不存在
     try {
-        res = await findUser(user_name);
+        let res = await findUser(user_name);
         if (!res) {
             console.error('用户不存在', {user_name})
             return ctx.app.emit('error', userNotExited, ctx);
@@ -36,13 +39,33 @@ const verifyUser = async (ctx, next) => {
         console.error('用户不存在', err)
         return ctx.app.emit('error', userNotExited, ctx);
     }
+   await next();
+}
+const passwordErr = async (ctx, next) => {
+    const {user_name, password} = ctx.request.body;
+    let res = await findUser(user_name);
+    console.log(bcrypt.compareSync(password, res.password))
     // 用户密码错误
-    if ( bcrypt.compareSync(password, res.password)) {
+    if (!bcrypt.compareSync(password, res.password)) {
         console.error('用户密码错误', {user_name});
         return ctx.app.emit('error', passwordError, ctx);
     }
     await next();
 }
+const somePassword = async (ctx, next) => {
+    const {user_name, password} = ctx.request.body;
+    let user = await findUser(user_name);
+    // 用户密码错误
+    if (bcrypt.compareSync(password, user.password)) {
+        console.error('新旧密码不能相同', {user_name})
+        return ctx.app.emit('error', pwdIsIdentical, ctx);
+    }
+    await next();
+}
 module.exports = {
-    userValidate
+    userValidate,
+    verifyUser,
+    userIsExited,
+    passwordErr,
+    somePassword
 }

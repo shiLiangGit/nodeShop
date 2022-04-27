@@ -4,6 +4,6 @@ const KoaBody = require('koa-body');
 const router = require("../router/user.route");
 const errHandle = require('../app/errHandle');
 app.use(KoaBody()); // 解析接口参数数据
-app.use(router.routes()); // 注册router
+app.use(router.routes()).use(router.allowedMethods()); // 注册router
 app.on('error', errHandle);
 module.exports = app;

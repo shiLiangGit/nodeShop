@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const {createUser} = require("../service/user.service");
-const {operateSuccess, registerFail, loginError} = require('../validate/validateResult');
-const {findUser} = require('../service/user.service');
+const {operateSuccess, registerFail, loginError, changePwdErr, pwdIsIdentical} = require('../validate/validateResult');
+const {findUser, updatePassword} = require('../service/user.service');
 const {JWT_SECRET} = require('../config/default');
 class UserController {
     // 注册
@@ -32,12 +33,31 @@ class UserController {
         try {
             let {password, ...res} = findUser(user_name);
             operateSuccess.message = '登录成功';
-            // expiresIn token过期时间
-            operateSuccess.result.token = jwt.sign(res, JWT_SECRET, {expiresIn: 60});
+            operateSuccess.result = {
+                token: jwt.sign(res, JWT_SECRET, {expiresIn: 60}) // expiresIn token过期时间
+            };
             ctx.body = operateSuccess;
         } catch (err) {
             console.error('登录错误', err);
             ctx.app.emit('error', loginError, ctx);
+        }
+    }
+    // 修改密码
+    async changePassword (ctx, next) {
+        let {user_name, password} = ctx.request.body;
+        let id = ctx.status.id;
+        try {
+            let res = await updatePassword({user_name, password});
+            if (res) {
+                operateSuccess.message = '密码修改成功';
+                ctx.body = operateSuccess;
+            } else {
+                ctx.app.emit('error', changePwdErr, ctx);
+                ctx.body = changePwdErr;
+            }
+        } catch (err) {
+            console.log('密码修改失败', err)
+            ctx.app.emit('error', changePwdErr, ctx);
         }
     }
 }

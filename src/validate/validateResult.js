@@ -33,6 +33,15 @@ module.exports = {
         code: '10006',
         message: '登录错误',
         result: ''
+    },
+    changePwdErr: {
+        code: '10007',
+        message: '密码修改失败',
+        result: ''
+    },
+    pwdIsIdentical: {
+        code: '10008',
+        message: '新旧密码不能相同',
+        result: ''
     }
-
 }

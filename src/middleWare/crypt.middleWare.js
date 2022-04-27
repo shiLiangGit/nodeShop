@@ -12,7 +12,7 @@ module.exports = {
         try {
             const salt = bcrypt.genSaltSync(10);
             // hashSync 两个参数必须是字符串
-            ctx.request.body.password = bcrypt.hashSync(password.toString(), salt);
+            ctx.request.body.password = bcrypt.hashSync(password, salt);
             await next();
         } catch (err) {
             console.log(err)
