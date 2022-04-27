@@ -6,7 +6,7 @@ const {findUser, updatePassword} = require('../service/user.service');
 const {JWT_SECRET} = require('../config/default');
 class UserController {
     // 注册
-    async register (ctx, next) {
+    async register (ctx) {
         // 解析参数
         let {user_name, password} = ctx.request.body;
         let res = null;
@@ -28,13 +28,13 @@ class UserController {
         }
     }
     // 登录
-    async login (ctx, next) {
+    async login (ctx) {
         let {user_name} = ctx.request.body;
         try {
             let {password, ...res} = findUser(user_name);
             operateSuccess.message = '登录成功';
             operateSuccess.result = {
-                token: jwt.sign(res, JWT_SECRET, {expiresIn: 60}) // expiresIn token过期时间
+                token: jwt.sign(res, JWT_SECRET, {expiresIn: '1d'}) // expiresIn token过期时间
             };
             ctx.body = operateSuccess;
         } catch (err) {
@@ -43,9 +43,8 @@ class UserController {
         }
     }
     // 修改密码
-    async changePassword (ctx, next) {
+    async changePassword (ctx) {
         let {user_name, password} = ctx.request.body;
-        let id = ctx.status.id;
         try {
             let res = await updatePassword({user_name, password});
             if (res) {

@@ -1,6 +1,8 @@
 const {findUser} = require('../service/user.service');
-const {userFormatError, userExited, registerFail, userNotExited, passwordError, pwdIsIdentical} = require('../validate/validateResult');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const {userFormatError, userExited, registerFail, userNotExited, passwordError, pwdIsIdentical, tokenError} = require('../validate/validateResult');
+const {JWT_SECRET} = require('../config/default');
 const userValidate = async (ctx, next) => {
     const {user_name, password} = ctx.request.body;
     if (!user_name || !password) {
@@ -44,7 +46,6 @@ const verifyUser = async (ctx, next) => {
 const passwordErr = async (ctx, next) => {
     const {user_name, password} = ctx.request.body;
     let res = await findUser(user_name);
-    console.log(bcrypt.compareSync(password, res.password))
     // 用户密码错误
     if (!bcrypt.compareSync(password, res.password)) {
         console.error('用户密码错误', {user_name});
@@ -62,6 +63,7 @@ const somePassword = async (ctx, next) => {
     }
     await next();
 }
+
 module.exports = {
     userValidate,
     verifyUser,

@@ -43,5 +43,10 @@ module.exports = {
         code: '10008',
         message: '新旧密码不能相同',
         result: ''
+    },
+    tokenError: {
+        code: '10009',
+        message: 'token过期',
+        result: ''
     }
 }
