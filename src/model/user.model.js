@@ -1,6 +1,6 @@
 const {DataTypes} = require('sequelize');
 const seq = require('../db/seq');
-const User = seq.define('shop_user', {
+const User = seq.define('shop_users', {
     user_name: {
         type: DataTypes.STRING,
         allowNull: false,

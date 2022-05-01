@@ -1,14 +1,13 @@
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET} = require("../config/default");
-const {tokenError} = require("../validate/validateResult");
+const {tokenError, noAdminPermission} = require("../validate/validateResult");
 const verifyToken = async (ctx, next) => {
     let {authorization} = ctx.request.header;
     let token = authorization.replace('Bearer ', '');
     try {
         // user 包含生成token时中payload的信息
         let user = jwt.verify(token, JWT_SECRET);
-        ctx.status.user = user;
-        console.log('eeeeee',res)
+        ctx.userInfo = user;
     } catch (err) {
         switch (err.name) {
             case 'TokenExpiredError':
@@ -29,7 +28,16 @@ const verifyToken = async (ctx, next) => {
     }
     await next();
 }
-
+const adminValidate = async (ctx, next) => {
+    let is_admin = ctx.userInfo.is_admin;
+    console.log(ctx.userInfo)
+    if (!is_admin) {
+        console.error('该用户没有管理员权限');
+        return ctx.app.emit('error', noAdminPermission, ctx);
+    }
+    await next();
+}
 module.exports = {
-    verifyToken
+    verifyToken,
+    adminValidate
 }

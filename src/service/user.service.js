@@ -1,10 +1,11 @@
 const User = require('../model/user.model');
 class UserService {
     // 创建用户
-    async createUser (user_name, password) {
+    async createUser (user_name, password, is_admin) {
         let params = {
             user_name,
-            password
+            password,
+            is_admin
         }
         let res = await User.create(params); // 新增用户
         return res; // 表数据都在dataValues中返回
@@ -15,7 +16,7 @@ class UserService {
             attributes: ['id', 'user_name', 'password', 'is_admin'],
             where: {user_name}
         });
-        return res ? res : null;
+        return res ? res.dataValues : null;
     }
     // 更新密码
     async updatePassword ({user_name, password}) {

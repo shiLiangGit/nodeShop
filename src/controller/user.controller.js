@@ -8,22 +8,20 @@ class UserController {
     // 注册
     async register (ctx) {
         // 解析参数
-        let {user_name, password} = ctx.request.body;
+        let {user_name, password, is_admin} = ctx.request.body;
         let res = null;
         try {
-            res = await createUser(user_name, password);
+            res = await createUser(user_name, password, is_admin);
             // 重置返回信息
             operateSuccess.message = '用户注册成功';
             operateSuccess.result = {
                 id: res.id,
-                user_name: res.user_name
+                user_name: res.user_name,
+                is_admin: res.is_admin
             }
             ctx.body = operateSuccess;
         } catch (err) {
-            console.error('用户注册错误', {
-                id: res.id,
-                user_name: res.user_name
-            })
+            console.error('用户注册错误', err)
             ctx.app.emit('error', registerFail, ctx);
         }
     }
@@ -31,7 +29,7 @@ class UserController {
     async login (ctx) {
         let {user_name} = ctx.request.body;
         try {
-            let {password, ...res} = findUser(user_name);
+            let {password, ...res} = await findUser(user_name);
             operateSuccess.message = '登录成功';
             operateSuccess.result = {
                 token: jwt.sign(res, JWT_SECRET, {expiresIn: '1d'}) // expiresIn token过期时间

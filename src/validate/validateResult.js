@@ -1,4 +1,9 @@
 module.exports = {
+    operateFail: {
+        code: '111111',
+        message: '操作失败',
+        result: ''
+    },
     operateSuccess: {
         code: 0,
         message: '用户注册成功',
@@ -47,6 +52,11 @@ module.exports = {
     tokenError: {
         code: '10009',
         message: 'token过期',
+        result: ''
+    },
+    noAdminPermission: {
+        code: '10100',
+        message: '该用户没有管理员权限',
         result: ''
     }
 }
