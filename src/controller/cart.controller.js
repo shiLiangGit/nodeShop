@@ -1,5 +1,5 @@
 const {validateParams} = require('../middleWare/params.middleWare');
-const {findGood, addGood} = require('../service/cart.service');
+const {findGood, addGood, getCartGoods} = require('../service/cart.service');
 const {operateSuccess, operateFail} = require('../validate/validateResult');
 class CartController {
     async addCart (ctx) {
@@ -33,6 +33,30 @@ class CartController {
             operateFail.message = '添加购物车失败';
             ctx.app.emit('error', operateFail, ctx);
         }
+    }
+    async getCartGoods (ctx) {
+       try {
+           let {pageIndex = 1, pageSize = 10} = ctx.params;
+           let {count, rows} = await getCartGoods(pageIndex, pageSize);
+           if (count) {
+               operateSuccess.message = '获取购物车商品成功';
+               operateSuccess.result = {
+                   pageIndex,
+                   pageSize,
+                   count,
+                   list: rows
+               }
+               ctx.body = operateSuccess;
+           } else {
+               console.log('购物车暂无内容');
+               operateFail.message = '购物车暂无内容';
+               ctx.app.emit('error', operateFail, ctx);
+           }
+       } catch (err) {
+           console.error('获取购物车商品失败', err);
+           operateFail.message = '获取购物车商品失败';
+           ctx.app.emit('error', operateFail, ctx);
+       }
     }
 }
 

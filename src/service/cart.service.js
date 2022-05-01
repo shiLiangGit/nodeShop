@@ -1,5 +1,6 @@
 const Cart = require('../model/carts.model');
 const {Op} = require("sequelize");
+const Goods = require("../model/goods.model");
 class CartService {
     async findGood ({user_id, goods_id}) {
         let res = await Cart.findOne({
@@ -20,16 +21,24 @@ class CartService {
         });
         return res.dataValues;
     }
-    async updateGood ({user_id, goods_id, number}) {
-        let res = await Cart.update({
-            number
-        },{
-            where: {
-                user_id,
-                goods_id,
+    async getCartGoods (pageIndex, pageSize) {
+        let offset = (pageIndex - 1) * pageSize;
+        let res = await Cart.findAndCountAll({
+            attributes: ['id', 'number', 'selected'],
+            offset,
+            limit: pageSize,
+            include: {
+                model: Goods,
+                as: 'goods_info',
+                attributes: ['id', 'goods_name', 'goods_price', 'goods_img'],
+                where: {
+                    is_offline: {
+                        [Op.is]: null
+                    }
+                }
             }
         });
-        return res[0] > 0;
+        return res;
     }
 }
 

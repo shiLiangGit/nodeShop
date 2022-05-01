@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const seq = require('../db/seq');
+const Goods = require('./goods.model');
 const Cart = seq.define('shop_carts', {
     goods_id: {
         type: DataTypes.INTEGER,
@@ -24,5 +25,9 @@ const Cart = seq.define('shop_carts', {
         comment:'是否选中'
     }
 })
+Cart.belongsTo(Goods, {
+    foreignKey: 'goods_id',
+    as: 'goods_info' // 获取结果取别名
+});
 // Cart.sync({force: true});
 module.exports = Cart;
