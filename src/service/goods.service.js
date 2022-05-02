@@ -24,7 +24,7 @@ class GoodsService {
         return !!res;
     }
     async getGoods(pageIndex, pageSize) {
-        // findAndCountAll 查询所有上级商品
+        // findAndCountAll 查询所有上架商品
         let offset = (pageIndex - 1) * pageSize
         let res = await Goods.findAndCountAll({
             offset,

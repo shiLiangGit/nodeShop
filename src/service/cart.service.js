@@ -40,6 +40,33 @@ class CartService {
         });
         return res;
     }
+    async changeCartGoods ({cartId, number, selected}) {
+        let res = await Cart.findByPk(cartId);
+        if (!res) return;
+        number && (res.number = number);
+        selected !== undefined && (res.selected = selected);
+        return await res.save();
+    }
+    async deleteCartGoods ({ids}) {
+        let res = await Cart.destroy({
+            where: {
+                id: {
+                    [Op.in]: ids
+                }
+            }
+        })
+        return res;
+    }
+    async selectedOrUnselected (user_id, selected) {
+        let res = await Cart.update({
+            selected
+        }, {
+            where: {
+                user_id
+            }
+        })
+        return res[0] > 0;
+    }
 }
 
 module.exports = new CartService();

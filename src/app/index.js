@@ -16,7 +16,8 @@ app.use(KoaBody({
         // __dirname 是当前文件所在目录，即app目录
         uploadDir: path.join(__dirname, '../upload'),
         keepExtensions: true
-    }
+    },
+    parsedMethods: ['POST', 'PATCH', 'PUT', 'DELETE'] // 配置ctx.request.body 支持 delete请求参数挂载body对象上
 })); // 解析接口参数数据
 app.use(KoaStatic(path.join(__dirname, '../upload'))); // 配置静态资源目录
 app.use(router.routes()).use(router.allowedMethods()); // 注册router
